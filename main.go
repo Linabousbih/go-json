@@ -3,7 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+
+	//"io"
 	"log"
 	"net/http"
 )
@@ -28,15 +29,15 @@ func main() {
 	defer response.Body.Close()
 
 	if response.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(response.Body)
-
-		if err != nil {
-			log.Fatal(err)
-		}
 
 		todoItem := Todo{}
 
-		json.Unmarshal(bodyBytes, &todoItem)
+		decoder := json.NewDecoder(response.Body)
+		decoder.DisallowUnknownFields()
+		if err := decoder.Decode(&todoItem); err != nil {
+
+			log.Fatal("Decode error:", err)
+		}
 
 		fmt.Printf("Data from API: %+v", todoItem)
 	}

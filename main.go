@@ -6,39 +6,23 @@ import (
 
 	//"io"
 	"log"
-	"net/http"
 )
 
 type Todo struct {
-	UserID    int    `json:"userId"`
+	UserID    int    `json:"-"`
 	ID        int    `json:"id"`
-	Title     string `json:"title"`
+	Title     string `json:"title,omitempty"`
 	Completed bool   `json:"completed"`
 }
 
 func main() {
-	url := "https://jsonplaceholder.typicode.com/todos/2"
+	todoItem := &Todo{1, 1, "", false}
 
-	response, err := http.Get(url)
+	todo, err := json.MarshalIndent(todoItem, "", "\t")
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//This will get executed later when the main function ends to prevent memory leaks
-	defer response.Body.Close()
-
-	if response.StatusCode == http.StatusOK {
-
-		todoItem := Todo{}
-
-		decoder := json.NewDecoder(response.Body)
-		decoder.DisallowUnknownFields()
-		if err := decoder.Decode(&todoItem); err != nil {
-
-			log.Fatal("Decode error:", err)
-		}
-
-		fmt.Printf("Data from API: %+v", todoItem)
-	}
+	fmt.Println(string(todo))
 }
